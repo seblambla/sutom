@@ -1,5 +1,5 @@
 const words = {
-  '2022-3-24': 'IRRESPECT',
+  '2022-3-24': 'BOOMERANG',
   '2022-3-25': 'OISIVETE',
   '2022-3-26': 'ABSINTHE',
   '2022-3-27': 'DACTYLO',

@@ -12,9 +12,8 @@ import {
 
 const today = new Date()
 const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()
-const WORD = words[date]
-
-const MAX_TRIES = 5
+const WORD = words[date].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase()
+const MAX_TRIES = 6
 
 const Game = () => {
   const initialResultsArray = []
@@ -41,7 +40,6 @@ const Game = () => {
   const [userHasWon, setUserHasWon] = useState(null)
 
   useEffect(() => {
-    console.info(userHasWon)
     if (typeof userHasWon === 'boolean') {
       if (userHasWon) {
         alert('Vous avez gagné !')
