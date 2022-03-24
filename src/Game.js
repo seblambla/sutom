@@ -16,24 +16,30 @@ const WORD = words[date].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUppe
 const MAX_TRIES = 6
 
 const Game = () => {
+  const splittedWord = WORD.split('')
   const initialResultsArray = []
+  const userValidLettersArray = []
 
   for (let i = 0; i < MAX_TRIES; i++) {
     const line = []
-    const splittedWord = WORD.split('')
 
     for (let j = 0; j < splittedWord.length; j++) {
       line.push(
         i === 0 && j === 0 
-          ? { value: splittedWord[0], score: 0 } 
-          : { value: '', score: 0 } 
+          ? { value: splittedWord[0], score: 0, showResult: false } 
+          : { value: '', score: 0, showResult: false } 
       )
     }
 
     initialResultsArray.push(line)
   }
 
+  for (let i = 0; i < splittedWord.length; i++) {
+    userValidLettersArray.push(i === 0 ? splittedWord[0] : '')
+  }
+
   const [results, setResults] = useState(initialResultsArray)
+  const [userValidLetters, setUserValidLetters] = useState(userValidLettersArray)
   const [currentLine, setCurrentLine] = useState(0)
   const [currentLetter, setCurrentLetter] = useState(0)
   const [inactiveLetters, setInactiveLetters] = useState([])
@@ -59,28 +65,55 @@ const Game = () => {
     const newResults = [...results]
 
     if (type === 'letter') {
-      const newCurrentLetter = currentLetter < WORD.length - 1 ? currentLetter + 1 : currentLetter
-      newResults[currentLine][newCurrentLetter] = { value, score: 0 }
+      if (currentLetter === 0) {
+        newResults[currentLine] = newResults[currentLine].map((letter, i) => {
+          if (i === 0 ) {
+            return letter
+          }
+
+          return {
+            value: '',
+            score: 0, 
+            showResult: false } 
+          }
+        )
+      }
+      
+      const newCurrentLetter = currentLetter < WORD.length - 1 
+        ? currentLetter === 0 && newResults[currentLine][currentLetter].value === value
+          ? currentLetter
+          : currentLetter + 1
+        : currentLetter
+
+      newResults[currentLine][newCurrentLetter] = { value, score: 0, showResult: false }
       setCurrentLetter(newCurrentLetter)
       setResults([...newResults])
     }
 
     else if (type === 'delete' && currentLetter > 0) {
-      newResults[currentLine][currentLetter] = { value: '', score: 0 }
+      if (currentLetter - 1 === 0) {
+        for (let i = 0; i < newResults[currentLine].length; i++) {
+          newResults[currentLine][i].value = userValidLetters[i]
+        }
+      } else {
+        newResults[currentLine][currentLetter] = { value: '', score: 0, showResult: false }
+      }
+
       setCurrentLetter(currentLetter - 1)
       setResults([...newResults])
     }
     
     else if (type === 'enter' && !results[currentLine].map(letter => letter.value).includes('')) {
-      let i = 0
-      const newInactiveLetters = [...inactiveLetters]
+      const newInactiveLetters = inactiveLetters
+      const newUserValidLetters = userValidLetters
 
-      function checkLetters() {
+      for (let i = 0; i < WORD.length; i++) {
         const currentLetter = newResults[currentLine][i]['value']
 
         // Good letter, right place
         if (currentLetter === WORD.split('')[i]) {
           newResults[currentLine][i]['score'] = 2
+          newUserValidLetters[i] = newResults[currentLine][i]['value']
         }
 
         // Good letter, wrong place
@@ -96,12 +129,20 @@ const Game = () => {
             newInactiveLetters.push(currentLetter)
           }
         }
+      }
 
+      setUserValidLetters(newUserValidLetters)
+      setResults([...newResults])
+      
+      let i = 0
+
+      function animateResult() {
+        newResults[currentLine][i]['showResult'] = true
+        i++
         setResults([...newResults])
-        i = i + 1
-
+        
         if (i < WORD.length) {
-          setTimeout(checkLetters, 250)
+          setTimeout(animateResult, 250)
         } else {
           if (getCurrentWord() === WORD) {
             setUserHasWon(true)
@@ -110,6 +151,11 @@ const Game = () => {
               newResults[currentLine + 1][0].value = WORD[0]
               setCurrentLine(currentLine + 1)
               setCurrentLetter(0)
+    
+              for (let j = 0; j < newResults[currentLine].length; j++) {
+                newResults[currentLine + 1][j].value = userValidLetters[j]
+              }
+    
               setResults([...newResults])
               setInactiveLetters([...newInactiveLetters])
             } else {
@@ -119,7 +165,7 @@ const Game = () => {
         }
       }
 
-      checkLetters()
+      animateResult()
     }
   }
 
@@ -128,9 +174,9 @@ const Game = () => {
       <Board>
         {results.map((line, i) => (
           <Line key={`line-${i}`}>
-            {line.map(({ value, score }, j) => (
+            {line.map(({ value, score, showResult }, j) => (
               <LetterContainer key={`letter-${i}-${j}`}>
-                <Letter score={ score }>{ value }</Letter>
+                <Letter score={ score } showResult={ showResult }>{ value }</Letter>
               </LetterContainer>
             ))}
           </Line>

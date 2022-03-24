@@ -1,6 +1,10 @@
 import styled from '@emotion/styled'
 
-const getLetterColor = (score) => {
+const getLetterColor = (score, showResult) => {
+  if (!showResult) {
+    return 'transparent'
+  }
+
   switch (score) {
     case 1:
       return '#dcc000'
@@ -43,6 +47,7 @@ export const Letter = styled.div`
   justify-content: center;
   font-weight: bold;
   color: #FFFFFF;
-  background-color: ${({ score }) => getLetterColor(score)};
-  border-radius: ${({ score }) => score === 1 ? '50%' : 0};
+  transition: background-color 0.5s;
+  background-color: ${({ score, showResult }) => getLetterColor(score, showResult)};
+  border-radius: ${({ score, showResult }) => score === 1 && showResult ? '50%' : 0};
 `
