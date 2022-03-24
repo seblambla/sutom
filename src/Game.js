@@ -36,7 +36,7 @@ const Game = () => {
 
   const [results, setResults] = useState(initialResultsArray)
   const [currentLine, setCurrentLine] = useState(0)
-  const [currentLetter, setCurrentLetter] = useState(1)
+  const [currentLetter, setCurrentLetter] = useState(0)
   const [inactiveLetters, setInactiveLetters] = useState([])
 
   const getCurrentWord = () => results[currentLine].map(letter => letter.value).join('')
@@ -45,18 +45,19 @@ const Game = () => {
     const newResults = [...results]
 
     if (type === 'letter') {
-      newResults[currentLine][currentLetter] = { value, score: 0 }
-      setCurrentLetter(currentLetter < WORD.length - 1 ? currentLetter + 1 : currentLetter)
+      const newCurrentLetter = currentLetter < WORD.length - 1 ? currentLetter + 1 : currentLetter
+      newResults[currentLine][newCurrentLetter] = { value, score: 0 }
+      setCurrentLetter(newCurrentLetter)
       setResults([...newResults])
     }
 
-    else if (type === 'delete' && currentLetter > 1) {
-      newResults[currentLine][currentLetter - 1] = { value: '', score: 0 }
+    else if (type === 'delete' && currentLetter > 0) {
+      newResults[currentLine][currentLetter] = { value: '', score: 0 }
       setCurrentLetter(currentLetter - 1)
       setResults([...newResults])
     }
-
-    else if (type === 'enter' && currentLetter === WORD.length - 1) {
+    
+    else if (type === 'enter' && results[currentLine][results[currentLine].length - 1]['value']) {
       let i = 0
       const newInactiveLetters = [...inactiveLetters]
 
@@ -84,7 +85,7 @@ const Game = () => {
         i = i + 1
 
         if (i < WORD.length) {
-          setTimeout(checkLetters, 500)
+          setTimeout(checkLetters, 250)
         } else {
           if (getCurrentWord() === WORD) {
             alert('Vous avez gagné !')
@@ -96,7 +97,7 @@ const Game = () => {
               setResults([...newResults])
               setInactiveLetters([...newInactiveLetters])
             } else {
-              alert('Vous avez perdu !')
+              alert(`Vous avez perdu ! Le mot était ${WORD}`)
             }
           }
         }
