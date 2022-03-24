@@ -50,9 +50,9 @@ const Game = () => {
       setResults([...newResults])
     }
 
-    else if (type === 'delete') {
-      newResults[currentLine][currentLetter] = { value: '', score: 0 }
-      setCurrentLetter(currentLetter > 1 ? currentLetter - 1 : 1)
+    else if (type === 'delete' && currentLetter > 1) {
+      newResults[currentLine][currentLetter - 1] = { value: '', score: 0 }
+      setCurrentLetter(currentLetter - 1)
       setResults([...newResults])
     }
 

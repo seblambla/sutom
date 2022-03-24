@@ -8,7 +8,7 @@ export const Line = styled.div`
 `
 
 export const Key = styled.div`
-  width: ${({ type }) => type === 'validate' ? '15vw' : '10vw'};
+  width: ${({ type }) => type === 'validate' ? '60px' : '40px'};
   height: 40px;
   display: flex;
   align-items: center;
