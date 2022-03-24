@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Keyboard from './Keyboard'
 import words from './words'
 
@@ -38,10 +38,26 @@ const Game = () => {
   const [currentLine, setCurrentLine] = useState(0)
   const [currentLetter, setCurrentLetter] = useState(0)
   const [inactiveLetters, setInactiveLetters] = useState([])
+  const [userHasWon, setUserHasWon] = useState(null)
+
+  useEffect(() => {
+    console.info(userHasWon)
+    if (typeof userHasWon === 'boolean') {
+      if (userHasWon) {
+        alert('Vous avez gagné !')
+      } else {
+        alert(`Vous avez perdu ! Le mot était ${WORD}`)
+      }
+    }
+  }, [userHasWon])
 
   const getCurrentWord = () => results[currentLine].map(letter => letter.value).join('')
 
   const onKeySelect = (type, value) => {
+    if (userHasWon) {
+      return
+    }
+
     const newResults = [...results]
 
     if (type === 'letter') {
@@ -71,7 +87,9 @@ const Game = () => {
 
         // Good letter, wrong place
         else if (WORD.split('').includes(currentLetter)) {
-          newResults[currentLine][i]['score'] = 1
+          const nbTested = newResults[currentLine].filter((letter) => letter.value === newResults[currentLine][i]['value'] && letter.score !== 0).length
+          const nbOccurrences = WORD.split('').filter((char) => char === newResults[currentLine][i]['value']).length
+          newResults[currentLine][i]['score'] = nbTested < nbOccurrences ? 1 : 0
         }
 
         // Wrong letter
@@ -88,7 +106,7 @@ const Game = () => {
           setTimeout(checkLetters, 250)
         } else {
           if (getCurrentWord() === WORD) {
-            alert('Vous avez gagné !')
+            setUserHasWon(true)
           } else {
             if (currentLine < MAX_TRIES - 1) {
               newResults[currentLine + 1][0].value = WORD[0]
@@ -97,7 +115,7 @@ const Game = () => {
               setResults([...newResults])
               setInactiveLetters([...newInactiveLetters])
             } else {
-              alert(`Vous avez perdu ! Le mot était ${WORD}`)
+              setUserHasWon(false)
             }
           }
         }

@@ -18,4 +18,5 @@ export const Key = styled.div`
   font-weight: bold;
   cursor: pointer;
   opacity: ${({ inactive }) => inactive ? 0.5 : 1};
+  user-select: none;
 `
