@@ -57,7 +57,7 @@ const Game = () => {
       setResults([...newResults])
     }
     
-    else if (type === 'enter' && results[currentLine][results[currentLine].length - 1]['value']) {
+    else if (type === 'enter' && !results[currentLine].map(letter => letter.value).includes('')) {
       let i = 0
       const newInactiveLetters = [...inactiveLetters]
 
@@ -93,7 +93,7 @@ const Game = () => {
             if (currentLine < MAX_TRIES - 1) {
               newResults[currentLine + 1][0].value = WORD[0]
               setCurrentLine(currentLine + 1)
-              setCurrentLetter(1)
+              setCurrentLetter(0)
               setResults([...newResults])
               setInactiveLetters([...newInactiveLetters])
             } else {
