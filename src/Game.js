@@ -15,6 +15,13 @@ const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()
 const WORD = words[date].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase()
 const MAX_TRIES = 6
 
+const isWordValid = async (word) => {
+  const response = await fetch(`https://dico-api-fr.herokuapp.com/api/check?word=${word}`)
+  const result = await response.json();
+  
+  return result.exists
+}
+
 const Game = () => {
   const splittedWord = WORD.split('')
   const initialResultsArray = []
@@ -57,7 +64,7 @@ const Game = () => {
 
   const getCurrentWord = () => results[currentLine].map(letter => letter.value).join('')
 
-  const onKeySelect = (type, value) => {
+  const onKeySelect = async (type, value) => {
     if (userHasWon) {
       return
     }
@@ -74,9 +81,9 @@ const Game = () => {
           return {
             value: '',
             score: 0, 
-            showResult: false } 
-          }
-        )
+            showResult: false 
+          } 
+        })
       }
       
       const newCurrentLetter = currentLetter < WORD.length - 1 
@@ -104,6 +111,13 @@ const Game = () => {
     }
     
     else if (type === 'enter' && !results[currentLine].map(letter => letter.value).includes('')) {
+      const checkWord = await isWordValid(getCurrentWord())
+
+      if (!checkWord) {
+        alert('Ce mot n\'existe pas !')
+        return
+      }
+
       const newInactiveLetters = inactiveLetters
       const newUserValidLetters = userValidLetters
 
