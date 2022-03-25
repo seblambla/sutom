@@ -16,7 +16,7 @@ export const Key = styled.div`
   background: #F4F4F4;
   margin-right: 1px;
   font-weight: bold;
-  cursor: pointer;
+  cursor: ${({ inactive }) => inactive ? 'not-allowed' : 'pointer'};
   opacity: ${({ inactive }) => inactive ? 0.5 : 1};
   user-select: none;
 `

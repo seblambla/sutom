@@ -44,6 +44,9 @@ const keysMap = [
 ]
 
 const Keyboard = ({ handleSelectKey, inactiveLetters }) => {
+  const isInactive = (content) => {
+    return inactiveLetters.includes(content)
+  }
   return (
     <KeyboardContainer>
       { keysMap.map((line, i) => (
@@ -52,8 +55,8 @@ const Keyboard = ({ handleSelectKey, inactiveLetters }) => {
             <Key 
               key={`key-${i}-${j}`} 
               type={ type } 
-              inactive={ type === 'letter' && inactiveLetters.includes(content) }
-              onClick={ () => handleSelectKey(type, content) }
+              inactive={ type === 'letter' && isInactive(content) }
+              onClick={ () => !isInactive(content) && handleSelectKey(type, content) }
             >
               { content }
             </Key>
