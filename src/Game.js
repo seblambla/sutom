@@ -15,21 +15,25 @@ const MAX_TRIES = 6
 const Game = ({ word = '' }) => {
   const WORD = word
   const splittedWord = WORD.split('')
-  const initialResultsArray = []
+  let initialResultsArray = []
   const userValidLettersArray = []
 
-  for (let i = 0; i < MAX_TRIES; i++) {
-    const line = []
+  if (localStorage.getItem('result')) {
+    initialResultsArray = JSON.parse(localStorage.getItem('result'))
+  } else {
+    for (let i = 0; i < MAX_TRIES; i++) {
+      const line = []
 
-    for (let j = 0; j < splittedWord.length; j++) {
-      line.push(
-        i === 0 && j === 0 
-          ? { value: splittedWord[0], score: 0, showResult: false } 
-          : { value: '', score: 0, showResult: false } 
-      )
+      for (let j = 0; j < splittedWord.length; j++) {
+        line.push(
+          i === 0 && j === 0 
+            ? { value: splittedWord[0], score: 0, showResult: false } 
+            : { value: '', score: 0, showResult: false } 
+        )
+      }
+
+      initialResultsArray.push(line)
     }
-
-    initialResultsArray.push(line)
   }
 
   for (let i = 0; i < splittedWord.length; i++) {
@@ -167,6 +171,7 @@ const Game = ({ word = '' }) => {
               setUserHasWon(false)
             }
           }
+          localStorage.setItem('result', JSON.stringify(newResults))
         }
       }
 
