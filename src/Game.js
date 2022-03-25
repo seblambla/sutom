@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Keyboard from './Keyboard'
 import API from './api'
 
@@ -51,11 +51,11 @@ const Game = ({ word = '' }) => {
         alert(`Vous avez perdu ! Le mot était ${WORD}`)
       }
     }
-  }, [userHasWon])
+  }, [userHasWon, WORD])
 
-  const getCurrentWord = () => results[currentLine].map(letter => letter.value).join('')
+  const getCurrentWord = useCallback(() => results[currentLine].map(letter => letter.value).join(''), [currentLine, results])
 
-  const onKeySelect = async (type, value) => {
+  const onKeySelect = useCallback(async (type, value) => {
     if (userHasWon) {
       return
     }
@@ -172,7 +172,29 @@ const Game = ({ word = '' }) => {
 
       animateResult()
     }
-  }
+  }, [WORD, currentLetter, currentLine, getCurrentWord, inactiveLetters, results, userHasWon, userValidLetters])
+
+  const handleKeyUp = useCallback((e) => {
+    if (e.key.length === 1) {
+      onKeySelect('letter', e.key.toUpperCase())
+    }
+
+    if (e.key === 'Backspace') {
+      onKeySelect('delete', null)
+    }
+
+    if (e.key === 'Enter') {
+      onKeySelect('enter', null)
+    }
+  }, [onKeySelect])
+
+  useEffect(() => {
+    document.addEventListener('keyup', handleKeyUp)
+
+    return (() => {
+      document.removeEventListener('keyup', handleKeyUp)
+    })
+  }, [handleKeyUp])
 
   if (!word) {
     return null
