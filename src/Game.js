@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Keyboard from './Keyboard'
-import words from './words'
+import API from './api'
 
 import {
   Container,
@@ -10,19 +10,10 @@ import {
   Letter
 } from './Game.style'
 
-const today = new Date()
-const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()
-const WORD = words[date].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase()
 const MAX_TRIES = 6
 
-const isWordValid = async (word) => {
-  const response = await fetch(`https://dico-api-fr.herokuapp.com/api/check?word=${word}`)
-  const result = await response.json();
-  
-  return result.exists
-}
-
-const Game = () => {
+const Game = ({ word = '' }) => {
+  const WORD = word
   const splittedWord = WORD.split('')
   const initialResultsArray = []
   const userValidLettersArray = []
@@ -111,7 +102,7 @@ const Game = () => {
     }
     
     else if (type === 'enter' && !results[currentLine].map(letter => letter.value).includes('')) {
-      const checkWord = await isWordValid(getCurrentWord())
+      const checkWord = await API.isWordValid(getCurrentWord())
 
       if (!checkWord) {
         alert('Ce mot n\'existe pas !')
@@ -181,6 +172,10 @@ const Game = () => {
 
       animateResult()
     }
+  }
+
+  if (!word) {
+    return null
   }
 
   return (
