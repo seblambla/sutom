@@ -145,6 +145,34 @@ const Game = ({ word = '' }) => {
       
       let i = 0
 
+      const getShareableResult = () => {
+        const getEmoji = (score) => {
+          switch (score) {
+            case 1:
+              return '🟡'
+    
+            case 2:
+              return '🟥'
+          
+            default:
+              return '🟦'
+          }
+        }
+        
+        let shareableResult = `SUTOM (${currentLine}/${MAX_TRIES})\n\n`
+    
+        for (let i = 0; i <= currentLine ; i++) {
+          for (let j = 0; j < newResults[i].length; j++) {
+            shareableResult += getEmoji(newResults[i][j].score)
+          }
+    
+          shareableResult += '\n'
+        }
+    
+        shareableResult += '\n http://sutom.netlify.com'
+        navigator.clipboard.writeText(shareableResult)
+      }
+
       function animateResult() {
         newResults[currentLine][i]['showResult'] = true
         i++
@@ -154,6 +182,7 @@ const Game = ({ word = '' }) => {
           setTimeout(animateResult, 250)
         } else {
           if (getCurrentWord() === WORD) {
+            // getShareableResult()
             setUserHasWon(true)
           } else {
             if (currentLine < MAX_TRIES - 1) {
